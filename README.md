@@ -24,7 +24,10 @@ go build ./cmd/who3
 |---------|------------|--------------------------|
 | `-port` | `:8081`    | Listen address           |
 | `-db`   | `who3.db`  | SQLite database file path|
-
+| Environment Variable  | Example                                         | Description                                                                 |
+|-----------------------|-------------------------------------------------|-----------------------------------------------------------------------------|
+| `CORS_ORIGINS`        | `https://example.com,https://app.example.com`   | Comma-separated list of exact origins to allow                              |
+| `CORS_ORIGIN_SUFFIXES`| `example.com,*.staging.example.com`             | Comma-separated host suffixes; any subdomain of each suffix is also allowed |
 ### API Endpoints
 
 #### Health Check
@@ -115,10 +118,19 @@ Response:
     "name": "Alice",
     "consecutive_count": 5,
     "server_id": "1",
+    "last_updated": "2026-04-08T21:00:00Z",
     "map_names": ["campgrounds", "bloodrun", "aerowalk", "dm6", "toxicity"]
   }
 ]
 ```
+
+### CORS
+
+The server applies CORS middleware to all routes. `localhost` and `http://localhost:5174` (SvelteKit dev server) are always allowed with no configuration required.
+
+Additional origins are configured via environment variables (see the table in [Running](#running) above). Origins not in the allowlist receive no `Access-Control-Allow-Origin` header — the browser then blocks the request.
+
+Suffix rules (e.g. `example.com`) match both the bare domain and all subdomains (`foo.example.com`, `bar.example.com`).
 
 ### Game-End Logic
 
