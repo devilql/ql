@@ -24,9 +24,10 @@ type Player struct {
 }
 
 type PlayerResponse struct {
-	SteamID          string   `json:"steam_id"`
-	Name             string   `json:"name"`
-	ConsecutiveCount int      `json:"consecutive_count"`
-	ServerID         string   `json:"server_id"`
-	MapNames         []string `json:"map_names"`
+	SteamID          string    `json:"steam_id"`
+	Name             string    `json:"name"`
+	ConsecutiveCount int       `json:"consecutive_count"`
+	ServerID         string    `json:"server_id"`
+	LastUpdated      time.Time `json:"last_updated"`
+	MapNames         []string  `json:"map_names"`
 }

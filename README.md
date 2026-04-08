@@ -55,11 +55,11 @@ Submit the list of players who just finished a game on a server. This increments
 curl -X POST http://localhost:8081/game-end \
   -H "Content-Type: application/json" \
   -d '{
-    "server_id": "duel-us-east-1",
+    "server_id": "1",
     "map_name": "campgrounds",
     "players": [
-      { "steam_id": "STEAM_0:1:12345", "name": "Alice" },
-      { "steam_id": "STEAM_0:1:67890", "name": "Bob" }
+      { "steam_id": "12345567343", "name": "kgb" },
+      { "steam_id": "22323232323", "name": "magdoll" }
     ]
   }'
 ```
@@ -75,15 +75,15 @@ After a second game where only Alice stays:
 curl -X POST http://localhost:8081/game-end \
   -H "Content-Type: application/json" \
   -d '{
-    "server_id": "duel-us-east-1",
-    "map_name": "bloodrun",
+    "server_id": "1",
+    "map_name": "spider",
     "players": [
-      { "steam_id": "STEAM_0:1:12345", "name": "Alice" }
+      { "steam_id": "12345567343", "name": "kgb" }
     ]
   }'
 ```
 
-Alice now has `consecutive_count: 2` and `map_names: ["campgrounds", "bloodrun"]`. Bob is reset to 0.
+kgb now has `consecutive_count: 2` and `map_names: ["campgrounds", "spider"]`. magdoll is reset to 0.
 
 #### Query Players
 
@@ -98,10 +98,10 @@ GET /players?server_id={id}&min={count}
 
 ```sh
 # Players on a specific server with 3+ consecutive games (default min)
-curl http://localhost:8081/players?server_id=duel-us-east-1
+curl http://localhost:8081/players?server_id=1
 
 # Players on a specific server with 2+ consecutive games
-curl http://localhost:8081/players?server_id=duel-us-east-1&min=2
+curl http://localhost:8081/players?server_id=1&min=2
 
 # All servers, min=3 (server_id omitted)
 curl http://localhost:8081/players
@@ -114,7 +114,7 @@ Response:
     "steam_id": "STEAM_0:1:12345",
     "name": "Alice",
     "consecutive_count": 5,
-    "server_id": "duel-us-east-1",
+    "server_id": "1",
     "map_names": ["campgrounds", "bloodrun", "aerowalk", "dm6", "toxicity"]
   }
 ]

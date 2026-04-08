@@ -189,13 +189,13 @@ func GetPlayersByMinCount(db *sql.DB, minCount int, serverID string) ([]PlayerRe
 	var err error
 	if serverID != "" {
 		rows, err = db.Query(
-			`SELECT steam_id, name, consecutive_count, server_id, map_names
+			`SELECT steam_id, name, consecutive_count, server_id, last_updated, map_names
 			 FROM players WHERE consecutive_count >= ? AND server_id = ?`,
 			minCount, serverID,
 		)
 	} else {
 		rows, err = db.Query(
-			`SELECT steam_id, name, consecutive_count, server_id, map_names
+			`SELECT steam_id, name, consecutive_count, server_id, last_updated, map_names
 			 FROM players WHERE consecutive_count >= ?`,
 			minCount,
 		)
@@ -208,7 +208,7 @@ func GetPlayersByMinCount(db *sql.DB, minCount int, serverID string) ([]PlayerRe
 	var results []PlayerResponse
 	for rows.Next() {
 		var p Player
-		if err := rows.Scan(&p.SteamID, &p.Name, &p.ConsecutiveCount, &p.ServerID, &p.MapNames); err != nil {
+		if err := rows.Scan(&p.SteamID, &p.Name, &p.ConsecutiveCount, &p.ServerID, &p.LastUpdated, &p.MapNames); err != nil {
 			return nil, err
 		}
 		maps := splitMaps(p.MapNames)
@@ -217,6 +217,7 @@ func GetPlayersByMinCount(db *sql.DB, minCount int, serverID string) ([]PlayerRe
 			Name:             p.Name,
 			ConsecutiveCount: p.ConsecutiveCount,
 			ServerID:         p.ServerID,
+			LastUpdated:      p.LastUpdated,
 			MapNames:         maps,
 		})
 	}
