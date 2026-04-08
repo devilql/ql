@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_ENDPOINT } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	interface Player {
 		steam_id: string;
@@ -28,7 +28,7 @@
 			}
 			params.set('min', String(minCount));
 
-			const res = await fetch(`${PUBLIC_API_ENDPOINT}/players?${params}`);
+			const res = await fetch(`${env.PUBLIC_API_ENDPOINT}/players?${params}`);
 			if (!res.ok) {
 				throw new Error(`HTTP ${res.status}: ${await res.text()}`);
 			}
