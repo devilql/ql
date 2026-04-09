@@ -39,7 +39,8 @@ if [[ ! -f "${CFG_FILE}" ]]; then
   mkdir -p "${CFG_DIR}"
   cp "${DEFAULT_CFG}" "${CFG_FILE}"
   chmod 640 "${CFG_FILE}"
-  echo "    Review ${CFG_FILE} and re-run the script if you need to change settings."
+  echo "    Review ${CFG_FILE} and re-run the script when you are ready to deploy."
+  exit 0
 fi
 
 # ---------------------------------------------------------------------------
