@@ -134,16 +134,19 @@ Suffix rules (e.g. `example.com`) match both the bare domain and all subdomains 
 
 ### Deployment (Ubuntu / systemd)
 
-Scripts are in `deploy/who3/`.
+Scripts are in `deploy/who3/`. The process is split into two steps: build (run as your normal user) and install (run as root).
 
 #### First install
 
 ```sh
-# On the server, clone the repo then run:
+# 1. Build the binary (no root required)
+bash deploy/who3/build.sh
+
+# 2. Deploy — installs the binary, creates the service user, and registers the systemd unit
 sudo bash deploy/who3/install.sh
 ```
 
-On first run the script copies `deploy/who3/who3.cfg.default` to `/etc/who3/who3.cfg` and exits, prompting you to review settings. Edit the file, then run the script again:
+On first run `install.sh` copies `deploy/who3/who3.cfg.default` to `/etc/who3/who3.cfg` and exits, prompting you to review settings. Edit the file, then run only the install step again:
 
 ```sh
 sudo nano /etc/who3/who3.cfg
@@ -168,10 +171,11 @@ This file lives outside the repo and is **never overwritten** by reinstalls, so 
 ```sh
 cd /path/to/repo
 git pull
+bash deploy/who3/build.sh
 sudo bash deploy/who3/install.sh
 ```
 
-The script detects the existing deployment, stops the service, rebuilds the binary from source, reinstalls it, and starts the service again. The database is untouched.
+`install.sh` detects the existing deployment, stops the service, installs the newly built binary, and starts the service again. The database is untouched.
 
 ---
 

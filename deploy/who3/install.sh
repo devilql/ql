@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# install.sh — Build and deploy who3 as a systemd service on Ubuntu.
+# install.sh — Deploy who3 as a systemd service on Ubuntu.
 #
-# Usage (run as root or with sudo, from anywhere inside the repo):
+# Build the binary first (as a normal user):
+#   bash deploy/who3/build.sh
+#
+# Then run this script as root:
 #   sudo bash deploy/who3/install.sh
 #
 # Configuration is read from /etc/who3/who3.cfg.
@@ -16,6 +19,16 @@ CFG_DIR="/etc/who3"
 CFG_FILE="${CFG_DIR}/who3.cfg"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 DEFAULT_CFG="${REPO_ROOT}/deploy/who3/who3.cfg.default"
+DIST_BINARY="${REPO_ROOT}/dist/${BINARY_NAME}"
+
+# ---------------------------------------------------------------------------
+# Verify the binary has been built
+# ---------------------------------------------------------------------------
+if [[ ! -f "${DIST_BINARY}" ]]; then
+  echo "ERROR: ${DIST_BINARY} not found." >&2
+  echo "       Run 'bash deploy/who3/build.sh' first (as a normal user)." >&2
+  exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # Seed config on first install — never overwrite an existing live config
@@ -57,24 +70,6 @@ if systemctl list-unit-files --quiet "${BINARY_NAME}.service" 2>/dev/null | grep
 fi
 
 # ---------------------------------------------------------------------------
-# Check for Go toolchain
-# ---------------------------------------------------------------------------
-echo "==> Checking for Go toolchain..."
-if ! command -v go &>/dev/null; then
-  echo "ERROR: 'go' not found. Install Go 1.21+ and ensure it is on PATH." >&2
-  exit 1
-fi
-echo "    $(go version)"
-
-# ---------------------------------------------------------------------------
-# Build
-# ---------------------------------------------------------------------------
-echo "==> Building ${BINARY_NAME}..."
-cd "${REPO_ROOT}"
-go build -trimpath -ldflags="-s -w" -o "/tmp/${BINARY_NAME}" ./cmd/who3/
-echo "    Binary written to /tmp/${BINARY_NAME}"
-
-# ---------------------------------------------------------------------------
 # Create service user (no login shell, no home directory)
 # ---------------------------------------------------------------------------
 if ! id -u "${SERVICE_USER}" &>/dev/null; then
@@ -87,8 +82,7 @@ fi
 # ---------------------------------------------------------------------------
 echo "==> Installing binary to ${INSTALL_DIR}/${BINARY_NAME}..."
 mkdir -p "${INSTALL_DIR}"
-install -m 0755 "/tmp/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-rm -f "/tmp/${BINARY_NAME}"
+install -m 0755 "${DIST_BINARY}" "${INSTALL_DIR}/${BINARY_NAME}"
 
 # Ensure the install directory is owned by the service user so it can write
 # the SQLite database and WAL files.
