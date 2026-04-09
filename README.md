@@ -132,6 +132,49 @@ Additional origins are configured via environment variables (see the table in [R
 
 Suffix rules (e.g. `example.com`) match both the bare domain and all subdomains (`foo.example.com`, `bar.example.com`).
 
+### Deployment (Ubuntu / systemd)
+
+Scripts are in `deploy/who3/`.
+
+#### First install
+
+```sh
+# On the server, clone the repo then run:
+sudo bash deploy/who3/install.sh
+```
+
+On first run the script copies `deploy/who3/who3.cfg.default` to `/etc/who3/who3.cfg` and exits, prompting you to review settings. Edit the file, then run the script again:
+
+```sh
+sudo nano /etc/who3/who3.cfg
+sudo bash deploy/who3/install.sh
+```
+
+#### Configuration — `/etc/who3/who3.cfg`
+
+This file lives outside the repo and is **never overwritten** by reinstalls, so your live settings are always preserved.
+
+| Variable               | Default         | Description                                      |
+|------------------------|-----------------|--------------------------------------------------|
+| `SERVICE_USER`         | `who3`          | OS user the service process runs as              |
+| `INSTALL_DIR`          | `/opt/who3`     | Directory where the binary and database live     |
+| `DB_PATH`              | `/opt/who3/who3.db` | SQLite database file path                    |
+| `LISTEN_ADDR`          | `:8081`         | TCP listen address                               |
+| `CORS_ORIGINS`         | _(empty)_       | Comma-separated exact origins to allow           |
+| `CORS_ORIGIN_SUFFIXES` | _(empty)_       | Comma-separated domain suffixes to allow         |
+
+#### Updating after a code change
+
+```sh
+cd /path/to/repo
+git pull
+sudo bash deploy/who3/install.sh
+```
+
+The script detects the existing deployment, stops the service, rebuilds the binary from source, reinstalls it, and starts the service again. The database is untouched.
+
+---
+
 ### Game-End Logic
 
 All steps run in a single SQLite transaction:
